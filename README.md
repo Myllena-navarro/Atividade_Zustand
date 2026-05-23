@@ -45,12 +45,6 @@ A store contém:
 * atualização de status
 * persistência local
 
-Exemplo:
-
-```tsx
-const tasks = useTaskStore((state) => state.tasks);
-```
-
 ---
 
 # 💾 Persistência com AsyncStorage
