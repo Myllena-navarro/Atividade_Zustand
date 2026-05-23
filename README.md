@@ -32,24 +32,6 @@ Além disso, o projeto implementa navegação com Expo Router, persistência loc
 
 ---
 
-# 📂 Estrutura do Projeto
-
-```bash
-app/
- ├── _layout.tsx
- ├── index.tsx
- ├── settings.tsx
- └── task/
-      └── [id].tsx
-
-src/
- ├── components/
- ├── store/
- │    └── useTaskStore.ts
- └── styles/
-```
-
----
 
 # 🧠 Gerenciamento Global com Zustand
 
