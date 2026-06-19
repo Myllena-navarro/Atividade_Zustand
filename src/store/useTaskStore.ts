@@ -12,6 +12,7 @@ import { api } from '../services/api';
 export interface Task {
   _id: number;
   text: string;
+  dueDate?: string;
   completed: boolean;
 }
 
@@ -55,8 +56,9 @@ export const useTaskStore =
         addTask: async (title) => {
           try {
             const response =
-              await api.post('/', {
-                title,
+              await api.post('/save', {
+                text: title,
+                completed: false,
               });
 
             set((state) => ({
@@ -82,13 +84,13 @@ export const useTaskStore =
 
             if (!currentTask) return;
 
-            await api.put(
-              `/${id}`,
-              {
-                completed:
-                  !currentTask.completed,
-              }
-            );
+            await api.post('/update', {
+              _id: id,
+              text: currentTask.text,
+              dueDate: currentTask.dueDate,
+              completed:
+                !currentTask.completed,
+            });
 
             set((state) => ({
               tasks: state.tasks.map(
@@ -109,9 +111,9 @@ export const useTaskStore =
 
         deleteTask: async (id) => {
           try {
-            await api.delete(
-              `/${id}`
-            );
+            await api.post('/delete', {
+              _id: id,
+            });
 
             set((state) => ({
               tasks: state.tasks.filter(
