@@ -39,6 +39,7 @@ interface AuthState {
   user: User | null;
   sessionToken: string | null;
   isLoading: boolean;
+  hasHydrated: boolean;
   error: string | null;
   signup: (
     input: SignupInput
@@ -95,6 +96,7 @@ export const useAuthStore =
         user: null,
         sessionToken: null,
         isLoading: false,
+        hasHydrated: false,
         error: null,
 
         signup: async (input) => {
@@ -201,12 +203,17 @@ export const useAuthStore =
         storage: createJSONStorage(
           () => AsyncStorage
         ),
-        onRehydrateStorage: () => (
-          state
-        ) => {
-          applySessionToken(
-            state?.sessionToken || null
-          );
+        onRehydrateStorage:
+          () => (state) => {
+            applySessionToken(
+              state?.sessionToken || null
+            );
+
+            state?.clearError();
+
+            useAuthStore.setState({
+              hasHydrated: true,
+            });
         },
         partialize: (state) => ({
           user: state.user,
