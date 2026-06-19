@@ -1,4 +1,7 @@
-import { Link } from 'expo-router';
+import {
+  Link,
+  router,
+} from 'expo-router';
 
 import { useState } from 'react';
 
@@ -8,16 +11,58 @@ import {
   TextInput,
   Pressable,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
+
+import { useAuthStore } from '../src/store/useAuthStore';
 
 export default function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [formError, setFormError] =
+    useState<string | null>(null);
 
-  function handleSignup() {
-    setName(name.trim());
-    setEmail(email.trim());
+  const signup = useAuthStore(
+    (state) => state.signup
+  );
+
+  const isLoading = useAuthStore(
+    (state) => state.isLoading
+  );
+
+  const authError = useAuthStore(
+    (state) => state.error
+  );
+
+  async function handleSignup() {
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim();
+
+    if (
+      !normalizedName ||
+      !normalizedEmail ||
+      !password
+    ) {
+      setFormError(
+        'Informe nome, e-mail e senha.'
+      );
+      return;
+    }
+
+    setFormError(null);
+    setName(normalizedName);
+    setEmail(normalizedEmail);
+
+    const success = await signup({
+      name: normalizedName,
+      email: normalizedEmail,
+      password,
+    });
+
+    if (success) {
+      router.replace('/login');
+    }
   }
 
   return (
@@ -53,13 +98,28 @@ export default function Signup() {
       />
 
       <Pressable
-        style={styles.button}
+        style={[
+          styles.button,
+          isLoading &&
+            styles.buttonDisabled,
+        ]}
         onPress={handleSignup}
+        disabled={isLoading}
       >
-        <Text style={styles.buttonText}>
-          Criar Conta
-        </Text>
+        {isLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>
+            Criar Conta
+          </Text>
+        )}
       </Pressable>
+
+      {formError || authError ? (
+        <Text style={styles.error}>
+          {formError || authError}
+        </Text>
+      ) : null}
 
       <Link
         href="/login"
@@ -101,6 +161,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
@@ -111,5 +175,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 20,
+  },
+
+  error: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 14,
   },
 });

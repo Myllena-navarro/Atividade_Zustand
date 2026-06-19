@@ -1,4 +1,7 @@
-import { Link } from 'expo-router';
+import {
+  Link,
+  router,
+} from 'expo-router';
 
 import { useState } from 'react';
 
@@ -8,14 +11,53 @@ import {
   TextInput,
   Pressable,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
+
+import { useAuthStore } from '../src/store/useAuthStore';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [formError, setFormError] =
+    useState<string | null>(null);
 
-  function handleLogin() {
-    setEmail(email.trim());
+  const login = useAuthStore(
+    (state) => state.login
+  );
+
+  const isLoading = useAuthStore(
+    (state) => state.isLoading
+  );
+
+  const authError = useAuthStore(
+    (state) => state.error
+  );
+
+  async function handleLogin() {
+    const normalizedEmail = email.trim();
+
+    if (
+      !normalizedEmail ||
+      !password
+    ) {
+      setFormError(
+        'Informe e-mail e senha.'
+      );
+      return;
+    }
+
+    setFormError(null);
+    setEmail(normalizedEmail);
+
+    const success = await login({
+      email: normalizedEmail,
+      password,
+    });
+
+    if (success) {
+      router.replace('/');
+    }
   }
 
   return (
@@ -43,13 +85,28 @@ export default function Login() {
       />
 
       <Pressable
-        style={styles.button}
+        style={[
+          styles.button,
+          isLoading &&
+            styles.buttonDisabled,
+        ]}
         onPress={handleLogin}
+        disabled={isLoading}
       >
-        <Text style={styles.buttonText}>
-          Entrar
-        </Text>
+        {isLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>
+            Entrar
+          </Text>
+        )}
       </Pressable>
+
+      {formError || authError ? (
+        <Text style={styles.error}>
+          {formError || authError}
+        </Text>
+      ) : null}
 
       <Link
         href="/signup"
@@ -91,6 +148,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
@@ -101,5 +162,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 20,
+  },
+
+  error: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 14,
   },
 });
