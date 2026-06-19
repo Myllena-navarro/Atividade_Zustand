@@ -53,95 +53,98 @@ export default function Home() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        Minhas tarefas
-      </Text>
+    <View className="flex-1 bg-gray-100">
+      <View style={styles.content}>
+        <Text style={styles.title}>
+          Minhas tarefas
+        </Text>
 
-      <View style={styles.form}>
-        <TextInput
-          placeholder="Digite uma tarefa"
-          value={text}
-          onChangeText={setText}
-          style={styles.input}
-        />
+        <View style={styles.form}>
+          <TextInput
+            placeholder="Digite uma tarefa"
+            value={text}
+            onChangeText={setText}
+            style={styles.input}
+          />
 
-        <Pressable
-          style={styles.button}
-          onPress={handleAddTask}
-        >
-          <Text style={styles.buttonText}>
-            Adicionar
-          </Text>
-        </Pressable>
-      </View>
+          <Pressable
+            style={styles.button}
+            onPress={handleAddTask}
+          >
+            <Text style={styles.buttonText}>
+              Adicionar
+            </Text>
+          </Pressable>
+        </View>
 
-      <FlatList
-        data={tasks}
-        keyExtractor={(item) =>
-          item._id.toString()
-        }
-        contentContainerStyle={styles.list}
-        renderItem={({ item }) => (
-          <View style={styles.task}>
-            <Pressable
-              style={[
-                styles.checkbox,
-                item.completed &&
-                  styles.checkboxCompleted,
-              ]}
-              onPress={() =>
-                toggleTask(item._id)
-              }
-            >
-              <Text style={styles.checkboxText}>
-                {item.completed ? 'OK' : ''}
-              </Text>
-            </Pressable>
-
-            <Pressable
-              style={styles.taskContent}
-              onPress={() => openTask(item)}
-            >
-              <Text
+        <FlatList
+          data={tasks}
+          keyExtractor={(item) =>
+            item._id.toString()
+          }
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => (
+            <View style={styles.task}>
+              <Pressable
                 style={[
-                  styles.taskText,
+                  styles.checkbox,
                   item.completed &&
-                    styles.taskTextCompleted,
+                    styles.checkboxCompleted,
                 ]}
+                onPress={() =>
+                  toggleTask(item._id)
+                }
               >
-                {item.text}
-              </Text>
-            </Pressable>
+                <Text style={styles.checkboxText}>
+                  {item.completed
+                    ? 'OK'
+                    : ''}
+                </Text>
+              </Pressable>
 
-            <Pressable
-              style={styles.deleteButton}
-              onPress={() =>
-                deleteTask(item._id)
-              }
-            >
-              <Text style={styles.delete}>
-                Excluir
-              </Text>
-            </Pressable>
-          </View>
-        )}
-        ListEmptyComponent={
-          <Text style={styles.empty}>
-            Nenhuma tarefa cadastrada.
-          </Text>
-        }
-      />
+              <Pressable
+                style={styles.taskContent}
+                onPress={() => openTask(item)}
+              >
+                <Text
+                  style={[
+                    styles.taskText,
+                    item.completed &&
+                      styles.taskTextCompleted,
+                  ]}
+                >
+                  {item.text}
+                </Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.deleteButton}
+                onPress={() =>
+                  deleteTask(item._id)
+                }
+              >
+                <Text style={styles.delete}>
+                  Excluir
+                </Text>
+              </Pressable>
+            </View>
+          )}
+          ListEmptyComponent={
+            <Text style={styles.empty}>
+              Nenhuma tarefa cadastrada.
+            </Text>
+          }
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  content: {
     flex: 1,
     padding: 20,
     paddingTop: 28,
-    backgroundColor: '#fff',
   },
 
   title: {
