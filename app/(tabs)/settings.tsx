@@ -1,12 +1,24 @@
+import { router } from 'expo-router';
+
 import {
   View,
   Text,
+  Pressable,
   StyleSheet,
 } from 'react-native';
 
+import { useAuthStore } from '../../src/store/useAuthStore';
 import { useTaskStore } from '../../src/store/useTaskStore';
 
 export default function Settings() {
+  const user = useAuthStore(
+    (state) => state.user
+  );
+
+  const logout = useAuthStore(
+    (state) => state.logout
+  );
+
   const totalTasks = useTaskStore(
     (state) => state.tasks.length
   );
@@ -26,6 +38,17 @@ export default function Settings() {
 
       <View style={styles.section}>
         <Text style={styles.label}>
+          Usuario
+        </Text>
+        <Text style={styles.value}>
+          {user?.name ||
+            user?.email ||
+            'Sessao ativa'}
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.label}>
           Total de tarefas
         </Text>
         <Text style={styles.value}>
@@ -41,6 +64,18 @@ export default function Settings() {
           {completedTasks}
         </Text>
       </View>
+
+      <Pressable
+        style={styles.logoutButton}
+        onPress={() => {
+          logout();
+          router.replace('/login');
+        }}
+      >
+        <Text style={styles.logoutText}>
+          Sair
+        </Text>
+      </Pressable>
     </View>
   );
 }
@@ -74,6 +109,20 @@ const styles = StyleSheet.create({
   value: {
     color: '#111',
     fontSize: 22,
+    fontWeight: 'bold',
+  },
+
+  logoutButton: {
+    borderWidth: 1,
+    borderColor: 'red',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 28,
+  },
+
+  logoutText: {
+    color: 'red',
     fontWeight: 'bold',
   },
 });
