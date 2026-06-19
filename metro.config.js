@@ -7,6 +7,12 @@ const {
 
 const config = getDefaultConfig(__dirname);
 
+config.resolver.blockList = [
+  /\/\.agents\/.*/,
+  /\/\.codex\/.*/,
+  /\/\.git\/.*/,
+];
+
 module.exports = withNativeWind(config, {
   input: './global.css',
 });

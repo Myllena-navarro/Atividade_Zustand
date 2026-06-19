@@ -1,20 +1,33 @@
+import { useState } from 'react';
+
+import {
+  AlertDialog,
+  AlertDialogBackdrop,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  Button,
+  ButtonText,
+  Heading,
+  Text,
+} from '@gluestack-ui/themed';
+
 import {
   Redirect,
   router,
   useLocalSearchParams,
 } from 'expo-router';
 
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-} from 'react-native';
+import { View } from 'react-native';
 
-import { useTaskStore } from '../../src/store/useTaskStore';
 import { useAuthStore } from '../../src/store/useAuthStore';
+import { useTaskStore } from '../../src/store/useTaskStore';
 
 export default function TaskDetails() {
+  const [showDeleteDialog, setShowDeleteDialog] =
+    useState(false);
+
   const sessionToken = useAuthStore(
     (state) => state.sessionToken
   );
@@ -52,10 +65,10 @@ export default function TaskDetails() {
 
   if (!task) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>
+      <View className="flex-1 bg-white px-5 pt-7">
+        <Heading size="2xl">
           Tarefa nao encontrada
-        </Text>
+        </Heading>
       </View>
     );
   }
@@ -63,135 +76,144 @@ export default function TaskDetails() {
   const selectedTask = task;
 
   async function handleDeleteTask() {
+    setShowDeleteDialog(false);
     await deleteTask(selectedTask._id);
     router.replace('/');
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
+    <View className="flex-1 bg-white px-5 pt-7">
+      <Heading
+        size="2xl"
+        color="$textDark900"
+        mb="$5"
+      >
         Detalhes da tarefa
-      </Text>
+      </Heading>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>
+      <View className="border-b border-gray-200 py-3.5">
+        <Text
+          size="sm"
+          color="$textLight600"
+          mb="$1"
+        >
           Descricao
         </Text>
-        <Text style={styles.description}>
-          {task.text}
+        <Text
+          size="lg"
+          color="$textDark900"
+        >
+          {selectedTask.text}
         </Text>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>
+      <View className="border-b border-gray-200 py-3.5">
+        <Text
+          size="sm"
+          color="$textLight600"
+          mb="$1"
+        >
           Status
         </Text>
-        <Text style={styles.status}>
-          {task.completed
+        <Text
+          size="md"
+          color="$textDark900"
+          fontWeight="$bold"
+        >
+          {selectedTask.completed
             ? 'Concluida'
             : 'Pendente'}
         </Text>
       </View>
 
-      {task.dueDate ? (
-        <View style={styles.section}>
-          <Text style={styles.label}>
+      {selectedTask.dueDate ? (
+        <View className="border-b border-gray-200 py-3.5">
+          <Text
+            size="sm"
+            color="$textLight600"
+            mb="$1"
+          >
             Prazo
           </Text>
-          <Text style={styles.status}>
+          <Text
+            size="md"
+            color="$textDark900"
+            fontWeight="$bold"
+          >
             {new Date(
-              task.dueDate
+              selectedTask.dueDate
             ).toLocaleDateString()}
           </Text>
         </View>
       ) : null}
 
-      <Pressable
-        style={styles.primaryButton}
-        onPress={() =>
-          toggleTask(task._id)
+      <View className="mt-6 gap-3">
+        <Button
+          action="primary"
+          onPress={() =>
+            toggleTask(selectedTask._id)
+          }
+        >
+          <ButtonText>
+            {selectedTask.completed
+              ? 'Marcar como pendente'
+              : 'Marcar como concluida'}
+          </ButtonText>
+        </Button>
+
+        <Button
+          variant="outline"
+          action="negative"
+          onPress={() =>
+            setShowDeleteDialog(true)
+          }
+        >
+          <ButtonText>
+            Excluir tarefa
+          </ButtonText>
+        </Button>
+      </View>
+
+      <AlertDialog
+        isOpen={showDeleteDialog}
+        onClose={() =>
+          setShowDeleteDialog(false)
         }
       >
-        <Text style={styles.primaryButtonText}>
-          {task.completed
-            ? 'Marcar como pendente'
-            : 'Marcar como concluida'}
-        </Text>
-      </Pressable>
+        <AlertDialogBackdrop />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <Heading size="lg">
+              Excluir tarefa
+            </Heading>
+          </AlertDialogHeader>
 
-      <Pressable
-        style={styles.deleteButton}
-        onPress={handleDeleteTask}
-      >
-        <Text style={styles.deleteButtonText}>
-          Excluir tarefa
-        </Text>
-      </Pressable>
+          <AlertDialogBody>
+            <Text>
+              Tem certeza que deseja excluir esta tarefa?
+            </Text>
+          </AlertDialogBody>
+
+          <AlertDialogFooter>
+            <Button
+              variant="outline"
+              action="secondary"
+              onPress={() =>
+                setShowDeleteDialog(false)
+              }
+            >
+              <ButtonText>Cancelar</ButtonText>
+            </Button>
+
+            <Button
+              action="negative"
+              onPress={handleDeleteTask}
+            >
+              <ButtonText>Excluir</ButtonText>
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    paddingTop: 28,
-    backgroundColor: '#fff',
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-
-  section: {
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-
-  label: {
-    color: '#555',
-    fontSize: 14,
-    marginBottom: 6,
-  },
-
-  description: {
-    color: '#111',
-    fontSize: 18,
-  },
-
-  status: {
-    color: '#111',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-
-  primaryButton: {
-    backgroundColor: '#2F80ED',
-    padding: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 24,
-  },
-
-  primaryButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-
-  deleteButton: {
-    borderWidth: 1,
-    borderColor: 'red',
-    padding: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 12,
-  },
-
-  deleteButtonText: {
-    color: 'red',
-    fontWeight: 'bold',
-  },
-});

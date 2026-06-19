@@ -2,6 +2,9 @@ import '../global.css';
 
 import { useEffect } from 'react';
 
+import { config } from '@gluestack-ui/config';
+import { GluestackUIProvider } from '@gluestack-ui/themed';
+
 import {
   router,
   Stack,
@@ -50,34 +53,36 @@ export default function Layout() {
   ]);
 
   return (
-    <Stack>
-      <Stack.Screen
-        name="(tabs)"
-        options={{
-          headerShown: false,
-        }}
-      />
+    <GluestackUIProvider config={config}>
+      <Stack>
+        <Stack.Screen
+          name="(tabs)"
+          options={{
+            headerShown: false,
+          }}
+        />
 
-      <Stack.Screen
-        name="task/[id]"
-        options={{
-          title: 'Detalhes',
-        }}
-      />
+        <Stack.Screen
+          name="task/[id]"
+          options={{
+            title: 'Detalhes',
+          }}
+        />
 
-      <Stack.Screen
-        name="login"
-        options={{
-          title: 'Entrar',
-        }}
-      />
+        <Stack.Screen
+          name="login"
+          options={{
+            title: 'Entrar',
+          }}
+        />
 
-      <Stack.Screen
-        name="signup"
-        options={{
-          title: 'Cadastro',
-        }}
-      />
-    </Stack>
+        <Stack.Screen
+          name="signup"
+          options={{
+            title: 'Cadastro',
+          }}
+        />
+      </Stack>
+    </GluestackUIProvider>
   );
 }

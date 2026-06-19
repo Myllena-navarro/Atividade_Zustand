@@ -1,156 +1,161 @@
-# 📱 Tasks App - Zustand + Expo Router
+# Tasks Mobile
 
-## 🚀 Sobre o Projeto
+Aplicativo mobile de tarefas desenvolvido com React Native, Expo e TypeScript.
 
-Este projeto foi desenvolvido como atividade prática de React Native utilizando Expo.
-O objetivo principal foi evoluir a arquitetura da aplicação de tarefas, substituindo gerenciamento local de estado por uma solução global moderna utilizando Zustand.
+O projeto usa Expo Router para navegacao, Zustand para estado global, NativeWind para estilizar componentes com classes utilitarias e Gluestack-UI para componentes acessiveis de formulario e dialogos.
 
-Além disso, o projeto implementa navegação com Expo Router, persistência local com AsyncStorage e organização baseada em componentes.
+## Funcionalidades
 
----
+- Login e cadastro de usuario.
+- Listagem de tarefas.
+- Adicao de novas tarefas.
+- Marcacao de tarefa como concluida ou pendente.
+- Tela de detalhes da tarefa.
+- Exclusao com confirmacao via `AlertDialog`.
+- Estado vazio quando nao ha tarefas cadastradas.
+- Persistencia local com Zustand e AsyncStorage.
 
-# 🎯 Objetivos da Atividade
+## Tecnologias
 
-* Implementar gerenciamento global de estado
-* Eliminar prop drilling
-* Utilizar Zustand para controle centralizado
-* Persistir tarefas localmente
-* Implementar navegação com Expo Router
-* Utilizar navegação Stack e Tabs
-* Melhorar organização e escalabilidade do projeto
+- React Native
+- Expo
+- Expo Router
+- TypeScript
+- Zustand
+- AsyncStorage
+- Axios
+- NativeWind
+- Tailwind CSS
+- Gluestack-UI
 
----
+## Implementacoes da Atividade
 
-# 🛠 Tecnologias Utilizadas
+### Exercicio 2: NativeWind no componente Task
 
-* React Native
-* Expo
-* TypeScript
-* Zustand
-* Expo Router
-* AsyncStorage
+O componente [`src/components/Task.tsx`](src/components/Task.tsx) foi refatorado para usar NativeWind no lugar da API classica de estilos.
 
----
+Ele possui:
 
+- fundo branco;
+- bordas arredondadas;
+- sombra leve;
+- padding interno;
+- organizacao em linha com `flex-row`;
+- texto e botoes separados pelas extremidades.
 
-# 🧠 Gerenciamento Global com Zustand
+### Exercicio 3: Gluestack-UI nos formularios
 
-O Zustand foi utilizado para centralizar o gerenciamento das tarefas da aplicação.
+O Gluestack-UI foi inicializado no layout raiz em [`app/_layout.tsx`](app/_layout.tsx).
 
-A store contém:
+Na tela principal, o formulario em [`app/(tabs)/index.tsx`](app/(tabs)/index.tsx) usa:
 
-* lista de tarefas
-* adição de tarefas
-* remoção de tarefas
-* atualização de status
-* persistência local
+- `Input`
+- `InputField`
+- `Button`
+- `ButtonText`
 
----
+### Exercicio 4: Confirmacao de exclusao
 
-# 💾 Persistência com AsyncStorage
+A exclusao de tarefas agora passa por um `AlertDialog` do Gluestack-UI.
 
-A persistência foi implementada utilizando:
+Antes de remover uma tarefa, o app exibe a mensagem:
 
-* `persist`
-* `createJSONStorage`
-* `AsyncStorage`
-
-Isso permite que as tarefas continuem salvas mesmo após fechar o aplicativo.
-
----
-
-# 🧭 Navegação com Expo Router
-
-O projeto utiliza:
-
-* Tabs Navigation
-* Stack Navigation
-* Rotas dinâmicas
-
-Exemplo de rota dinâmica:
-
-```bash
-/task/[id].tsx
+```text
+Tem certeza que deseja excluir esta tarefa?
 ```
 
----
+A requisicao para o backend e a remocao da lista acontecem apenas apos a confirmacao.
 
-# 📱 Funcionalidades
+### Exercicio 5: Empty State
 
-✅ Adicionar tarefas
-✅ Remover tarefas
-✅ Marcar tarefas como concluídas
-✅ Persistência local
-✅ Navegação entre telas
-✅ Tela de detalhes da tarefa
-✅ Estado global com Zustand
-✅ Navegação com Expo Router
+O componente [`src/components/EmptyState.tsx`](src/components/EmptyState.tsx) e exibido quando a lista de tarefas esta vazia.
 
----
+Ele combina:
 
-# 🚀 Como Executar o Projeto
+- `View` com classes do NativeWind para centralizacao;
+- `Heading` e `Text` do Gluestack-UI para tipografia.
 
-## 1. Clonar repositório
+## Estrutura Principal
 
-```bash
-git clone URL_DO_REPOSITORIO
+```text
+app/
+  _layout.tsx
+  (tabs)/
+    index.tsx
+    settings.tsx
+  task/
+    [id].tsx
+
+src/
+  components/
+    EmptyState.tsx
+    Task.tsx
+  services/
+    api.ts
+  store/
+    useAuthStore.ts
+    useTaskStore.ts
 ```
 
----
+## Como Rodar
 
-## 2. Entrar na pasta
-
-```bash
-cd nome-do-projeto
-```
-
----
-
-## 3. Instalar dependências
+Instale as dependencias:
 
 ```bash
 npm install
 ```
 
----
-
-## 4. Executar projeto
+Inicie o servidor de desenvolvimento:
 
 ```bash
-npx expo start
+npm start
 ```
 
----
-
-# 📦 Dependências Instaladas
+Ou use um alvo especifico:
 
 ```bash
-npm install zustand
-npx expo install @react-native-async-storage/async-storage
-npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
+npm run android
+npm run ios
+npm run web
 ```
 
----
+## Backend
 
-# 🎓 Conceitos Trabalhados
+Este repositorio contem o front mobile. A API usada pelo app esta configurada em:
 
-* Estado Global
-* Hooks
-* Persistência de Dados
-* Arquitetura React Native
-* Navegação Mobile
-* Componentização
-* Performance com Selectors
-* Organização de Projeto
+```text
+src/services/api.ts
+```
 
----
+Por padrao, o app aponta para:
 
-# 👩‍💻 Autora
+```text
+http://192.168.10.40:5001
+```
+
+Se o backend estiver em outro endereco, ajuste o `baseURL` nesse arquivo.
+
+## Scripts
+
+```bash
+npm start
+npm run android
+npm run ios
+npm run web
+```
+
+## Validacao
+
+Para verificar erros de TypeScript:
+
+```bash
+npx tsc --noEmit
+```
+
+## Autora
 
 Myllena Navarro Lins
 
----
+## Observacao
 
-# 📌 Observação
-
-Este projeto foi desenvolvido para fins acadêmicos como atividade prática da disciplina de desenvolvimento mobile.
+Projeto desenvolvido para fins academicos na disciplina de desenvolvimento mobile.

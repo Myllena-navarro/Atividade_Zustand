@@ -1,17 +1,26 @@
 import { useEffect, useState } from 'react';
 
+import {
+  Button,
+  ButtonText,
+  Heading,
+  Input,
+  InputField,
+} from '@gluestack-ui/themed';
+
 import { router } from 'expo-router';
 
 import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
   FlatList,
-  StyleSheet,
+  View,
 } from 'react-native';
 
-import { Task, useTaskStore } from '../../src/store/useTaskStore';
+import EmptyState from '../../src/components/EmptyState';
+import TaskCard from '../../src/components/Task';
+import {
+  Task,
+  useTaskStore,
+} from '../../src/store/useTaskStore';
 
 export default function Home() {
   const [text, setText] = useState('');
@@ -41,10 +50,11 @@ export default function Home() {
   }, [fetchTasks]);
 
   async function handleAddTask() {
-    if (!text.trim()) return;
+    const taskText = text.trim();
 
-    await addTask(text.trim());
+    if (!taskText) return;
 
+    await addTask(taskText);
     setText('');
   }
 
@@ -54,27 +64,37 @@ export default function Home() {
 
   return (
     <View className="flex-1 bg-gray-100">
-      <View style={styles.content}>
-        <Text style={styles.title}>
+      <View className="flex-1 px-5 pt-7">
+        <Heading
+          size="2xl"
+          color="$textDark900"
+          mb="$5"
+        >
           Minhas tarefas
-        </Text>
+        </Heading>
 
-        <View style={styles.form}>
-          <TextInput
-            placeholder="Digite uma tarefa"
-            value={text}
-            onChangeText={setText}
-            style={styles.input}
-          />
-
-          <Pressable
-            style={styles.button}
-            onPress={handleAddTask}
+        <View className="mb-5 gap-3">
+          <Input
+            variant="outline"
+            size="md"
+            bg="$white"
           >
-            <Text style={styles.buttonText}>
-              Adicionar
-            </Text>
-          </Pressable>
+            <InputField
+              placeholder="Digite uma tarefa"
+              value={text}
+              onChangeText={setText}
+              returnKeyType="done"
+              onSubmitEditing={handleAddTask}
+            />
+          </Input>
+
+          <Button
+            action="primary"
+            onPress={handleAddTask}
+            isDisabled={!text.trim()}
+          >
+            <ButtonText>Adicionar</ButtonText>
+          </Button>
         </View>
 
         <FlatList
@@ -82,163 +102,25 @@ export default function Home() {
           keyExtractor={(item) =>
             item._id.toString()
           }
-          contentContainerStyle={styles.list}
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingBottom: 24,
+          }}
           renderItem={({ item }) => (
-            <View style={styles.task}>
-              <Pressable
-                style={[
-                  styles.checkbox,
-                  item.completed &&
-                    styles.checkboxCompleted,
-                ]}
-                onPress={() =>
-                  toggleTask(item._id)
-                }
-              >
-                <Text style={styles.checkboxText}>
-                  {item.completed
-                    ? 'OK'
-                    : ''}
-                </Text>
-              </Pressable>
-
-              <Pressable
-                style={styles.taskContent}
-                onPress={() => openTask(item)}
-              >
-                <Text
-                  style={[
-                    styles.taskText,
-                    item.completed &&
-                      styles.taskTextCompleted,
-                  ]}
-                >
-                  {item.text}
-                </Text>
-              </Pressable>
-
-              <Pressable
-                style={styles.deleteButton}
-                onPress={() =>
-                  deleteTask(item._id)
-                }
-              >
-                <Text style={styles.delete}>
-                  Excluir
-                </Text>
-              </Pressable>
-            </View>
+            <TaskCard
+              task={item}
+              onOpen={() => openTask(item)}
+              onToggle={() =>
+                toggleTask(item._id)
+              }
+              deleteTask={() =>
+                deleteTask(item._id)
+              }
+            />
           )}
-          ListEmptyComponent={
-            <Text style={styles.empty}>
-              Nenhuma tarefa cadastrada.
-            </Text>
-          }
+          ListEmptyComponent={<EmptyState />}
         />
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  content: {
-    flex: 1,
-    padding: 20,
-    paddingTop: 28,
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-
-  form: {
-    marginBottom: 18,
-  },
-
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-  },
-
-  button: {
-    backgroundColor: '#2F80ED',
-    padding: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-
-  list: {
-    paddingBottom: 24,
-  },
-
-  task: {
-    minHeight: 58,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 12,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-
-  checkbox: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#2F80ED',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  checkboxCompleted: {
-    backgroundColor: '#2F80ED',
-  },
-
-  checkboxText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-
-  taskContent: {
-    flex: 1,
-    alignSelf: 'stretch',
-    justifyContent: 'center',
-  },
-
-  taskText: {
-    fontSize: 16,
-  },
-
-  taskTextCompleted: {
-    color: '#777',
-    textDecorationLine: 'line-through',
-  },
-
-  deleteButton: {
-    padding: 6,
-  },
-
-  delete: {
-    color: 'red',
-    fontWeight: 'bold',
-  },
-
-  empty: {
-    color: '#777',
-    textAlign: 'center',
-    marginTop: 32,
-  },
-});
