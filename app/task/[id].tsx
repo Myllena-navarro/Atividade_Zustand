@@ -1,4 +1,5 @@
 import {
+  Redirect,
   router,
   useLocalSearchParams,
 } from 'expo-router';
@@ -11,8 +12,17 @@ import {
 } from 'react-native';
 
 import { useTaskStore } from '../../src/store/useTaskStore';
+import { useAuthStore } from '../../src/store/useAuthStore';
 
 export default function TaskDetails() {
+  const sessionToken = useAuthStore(
+    (state) => state.sessionToken
+  );
+
+  const hasHydrated = useAuthStore(
+    (state) => state.hasHydrated
+  );
+
   const { id } = useLocalSearchParams<{
     id: string;
   }>();
@@ -32,6 +42,13 @@ export default function TaskDetails() {
   const deleteTask = useTaskStore(
     (state) => state.deleteTask
   );
+
+  if (
+    hasHydrated &&
+    !sessionToken
+  ) {
+    return <Redirect href="/login" />;
+  }
 
   if (!task) {
     return (
