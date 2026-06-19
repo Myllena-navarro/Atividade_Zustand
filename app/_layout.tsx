@@ -16,6 +16,20 @@ export default function Layout() {
           title: 'Detalhes',
         }}
       />
+
+      <Stack.Screen
+        name="login"
+        options={{
+          title: 'Entrar',
+        }}
+      />
+
+      <Stack.Screen
+        name="signup"
+        options={{
+          title: 'Cadastro',
+        }}
+      />
     </Stack>
   );
 }
